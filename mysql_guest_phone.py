@@ -11,7 +11,6 @@ connection = pymysql.connect(
 
 try:
     with connection.cursor() as cursor:
-        # Create a new record
         ans = input("Would you like to add new guest to DB? (y/n) ")
         if ans == 'y' or ans == 'Y':
             firstName = input('Input guest First Name: ')
