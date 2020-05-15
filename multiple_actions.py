@@ -24,30 +24,30 @@ try:
 
             # showing all DB info with phone numbers
             if option == 'show':
-                sql = 'SELECT * FROM `guests` LEFT JOIN `phones` USING (`guest_Id`)'
+                sql = 'SELECT * FROM `guests` LEFT JOIN `phones` USING (`guest_id`)'
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 print(*result, sep='\n')
 
             # adding new line to DB with phones
             elif option == 'add':
-                firstName = input('Input guest First Name: ')
-                lastName = input('Input guest Last Name: ')
+                first_name = input('Input guest First Name: ')
+                last_name = input('Input guest Last Name: ')
                 email = input('Input guest Email: ')
                 phones = input('Input guest Phones: (use space to separate them) ').split()
 
-                sql = 'INSERT INTO `guests` (`guest_FirstName`, `guest_LastName`, `guest_Email`) VALUES (%s, %s, %s)'
-                cursor.execute(sql, (firstName, lastName, email))
+                sql = 'INSERT INTO guests (first_name, last_name, email) VALUES (%s, %s, %s)'
+                cursor.execute(sql, (first_name, last_name, email))
                 connection.commit()
 
-                sql = 'SELECT `guest_Id` FROM `guests` WHERE `guest_Email`=%s'
+                sql = 'SELECT LAST_INSERT_ID()'
                 cursor.execute(sql, email)
                 result = cursor.fetchone()
 
                 for phone in phones:
-                    sql = 'INSERT INTO `phones` (`guest_Id`, `phone_Number`) VALUES (%s, %s)'
-                    cursor.execute(sql, (result['guest_Id'], phone))
-                    connection.commit()
+                    sql = 'INSERT INTO phones (guest_id, phone_number) VALUES (%s, %s)'
+                    cursor.execute(sql, (result['LAST_INSERT_ID()'], phone))
+                connection.commit()
                 print('Success')
 
             # editing one of the fields in DB
@@ -58,15 +58,15 @@ try:
 
             # deleting guest from DB:
             elif option == 'delete':
-                guestEmail = input('\nPlease enter guest email: ')
-                sql = 'SELECT * FROM `guests` LEFT JOIN `phones` USING (`guest_Id`) WHERE `guest_Email`=%s'
-                cursor.execute(sql, guestEmail)
+                email = input('\nPlease enter guest email: ')
+                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id) WHERE email=%s'
+                cursor.execute(sql, email)
                 print('Here all records for this guest:')
                 print(*cursor.fetchall(), sep='\n')
                 action = input('Do you want to delete this guest? (y/n) ')
                 if action == 'y' or action == 'Y':
-                    sql = 'DELETE FROM `guests` WHERE `guest_Email`=%s'
-                    cursor.execute(sql, guestEmail)
+                    sql = 'DELETE FROM `guests` WHERE `email`=%s'
+                    cursor.execute(sql, email)
                     connection.commit()
                     print('Success')
             # case for 'else'
