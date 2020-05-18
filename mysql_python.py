@@ -35,7 +35,7 @@ try:
             print('Ok. here what you have in DB: ')
 
     with connection.cursor() as cursor:
-        sql = "SELECT * FROM `guests` LEFT JOIN `phones` USING (`guest_id`)"
+        sql = "SELECT * FROM guests LEFT JOIN phones USING (guest_id)"
         cursor.execute(sql)
         result = cursor.fetchall()
         print(*result, sep='\n')
