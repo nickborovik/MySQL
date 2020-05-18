@@ -22,13 +22,14 @@ try:
             cursor.execute(sql, (first_name, last_name, email))
             connection.commit()
 
-            sql = "SELECT LAST_INSERT_ID()"
-            cursor.execute(sql)
-            result = cursor.fetchone()
+            sql = "INSERT INTO phones (guest_id, phone_number) VALUES "
 
             for phone in phones:
-                sql = "INSERT INTO phones (guest_id, phone_number) VALUES (%s, %s)"
-                cursor.execute(sql, (result['LAST_INSERT_ID()'], phone))
+                if phone == phones[-1]:
+                    sql += '(LAST_INSERT_ID(), {})'.format(phone)
+                else:
+                    sql += '(LAST_INSERT_ID(), {}), '.format(phone)
+            cursor.execute(sql)
             connection.commit()
 
         else:

@@ -40,25 +40,26 @@ try:
                 cursor.execute(sql, (first_name, last_name, email))
                 connection.commit()
 
-                sql = 'SELECT LAST_INSERT_ID()'
-                cursor.execute(sql)
-                result = cursor.fetchone()
+                sql = "INSERT INTO phones (guest_id, phone_number) VALUES "
 
                 for phone in phones:
-                    sql = 'INSERT INTO phones (guest_id, phone_number) VALUES (%s, %s)'
-                    cursor.execute(sql, (result['LAST_INSERT_ID()'], phone))
+                    if phone == phones[-1]:
+                        sql += '(LAST_INSERT_ID(), {})'.format(phone)
+                    else:
+                        sql += '(LAST_INSERT_ID(), {}), '.format(phone)
+                cursor.execute(sql)
                 connection.commit()
                 print('Success')
 
             # editing one of the fields in DB
-            # elif option == 'edit':
-            #     guest_name = input('What guest you want to edit? (enter guest Frist Name and Last Name) ')
-            #     sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id) WHERE first_name=%s, last_name=%s'
-            #     cursor.execute(sql, (guest_name[0], guest_name[1]))
-            #     print(*cursor.fetchall(), sep='\n')
-            #     field = input('What field you want to edit? (select one: firstName, lastName, email, phone) ')
-            #     if field == 'firstName':
-            #         sql = 'UPDATE guests SET '
+            elif option == 'edit':
+                guest_name = input('What guest you want to edit? (enter guest Frist Name and Last Name) ')
+                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id) WHERE first_name=%s, last_name=%s'
+                cursor.execute(sql, (guest_name[0], guest_name[1]))
+                print(*cursor.fetchall(), sep='\n')
+                field = input('What field you want to edit? (select one: firstName, lastName, email, phone) ')
+                if field == 'firstName':
+                    sql = 'UPDATE guests SET '
 
             # deleting guest from DB:
             elif option == 'del':
