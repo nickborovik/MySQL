@@ -24,7 +24,7 @@ try:
 
             # showing all DB info with phone numbers
             if option == 'show':
-                sql = 'SELECT * FROM `guests` LEFT JOIN `phones` USING (`guest_id`)'
+                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id)'
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 print(*result, sep='\n')
@@ -40,7 +40,7 @@ try:
                 cursor.execute(sql, (first_name, last_name, email))
                 connection.commit()
 
-                sql = "INSERT INTO phones (guest_id, phone_number) VALUES "
+                sql = 'INSERT INTO phones (guest_id, phone_number) VALUES '
 
                 for phone in phones:
                     if phone == phones[-1]:
@@ -53,13 +53,25 @@ try:
 
             # editing one of the fields in DB
             elif option == 'edit':
-                guest_name = input('What guest you want to edit? (enter guest Frist Name and Last Name) ')
-                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id) WHERE first_name=%s, last_name=%s'
-                cursor.execute(sql, (guest_name[0], guest_name[1]))
+                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id)'
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                print(*result, sep='\n')
+
+                guest_id = input('What guest you want to edit? (enter guest ID) ')
+                sql = 'SELECT * FROM guests LEFT JOIN phones USING (guest_id) WHERE guest_id=%s'
+                cursor.execute(sql, guest_id)
                 print(*cursor.fetchall(), sep='\n')
-                field = input('What field you want to edit? (select one: firstName, lastName, email, phone) ')
-                if field == 'firstName':
-                    sql = 'UPDATE guests SET '
+
+                field = input('What field you want to edit? (select one: first_name, last_name, email) ')
+                if field == 'first_name' or field == 'last_name' or field == 'email':
+                    value = input('Enter new value for this field: ')
+                    sql = 'UPDATE guests SET {}=%s WHERE guest_id=%s'.format(field)
+                    cursor.execute(sql, (value, guest_id))
+                    connection.commit()
+                    print('Success')
+                else:
+                    print('Wrong input, try again!')
 
             # deleting guest from DB:
             elif option == 'del':
@@ -75,7 +87,7 @@ try:
                     connection.commit()
                     print('Success')
 
-            # case for 'else'
+            # case for anything else
             else:
                 pass
 finally:
